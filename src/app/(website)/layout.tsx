@@ -1,0 +1,24 @@
+
+import { Suspense } from "react";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ChatWidget from "@/components/ChatWidget";
+
+export default function WebsiteLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <div className="relative bg-white min-h-screen flex flex-col">
+      <Suspense fallback={<div className="h-20" />}>
+        <Header />
+      </Suspense>
+      <main className="transition-opacity duration-500 flex-grow">
+        {children}
+      </main>
+      <Footer />
+      <ChatWidget />
+    </div>
+  );
+}
