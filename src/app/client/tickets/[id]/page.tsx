@@ -8,8 +8,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  ArrowLeft, 
+import {
+  ArrowLeft,
   Download,
   Send,
   ChevronDown,
@@ -86,7 +86,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
       getTicketAttachments(id),
       getTicketComments(id, false),
     ]);
-    
+
     if (!ticketRes.success) {
       setError(ticketRes.error || 'Failed to load ticket');
       setLoading(false);
@@ -120,13 +120,13 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
   // Get all attachments (from ticket + comments)
   const getAllAttachments = () => {
-    const ticketAtts = attachments.map(a => ({ name: a.name, url: a.url, source: 'ticket' }));
+    const ticketAtts = attachments.map((a: any) => ({ name: a.name, url: a.url, source: 'ticket' }));
     const commentAtts = comments
-      .filter(c => c.attachmentUrl)
-      .map(c => ({ 
-        name: `Attachment from ${c.userName || 'User'}`, 
-        url: c.attachmentUrl!, 
-        source: 'comment' 
+      .filter((c: any) => c.attachmentUrl)
+      .map((c: any) => ({
+        name: `Attachment from ${c.userName || 'User'}`,
+        url: c.attachmentUrl!,
+        source: 'comment'
       }));
     return [...ticketAtts, ...commentAtts];
   };
@@ -145,7 +145,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
     setSelectedFile(null);
     setReplyExpanded(false);
     setSubmitting(false);
-    
+
     const { data } = await getTicketComments(id, false);
     setComments(data || []);
     fetchData();
@@ -153,7 +153,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
   const handleSubmitRating = async () => {
     if (!user || rating === 0) return;
-    
+
     setSubmitting(true);
     const result = await submitTicketRating(id, user.id, rating, ratingComment || undefined);
     if (result.success) {
@@ -190,9 +190,9 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
   const formatDate = (date: Date | null) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('en-US', { 
-      month: '2-digit', 
-      day: '2-digit', 
+    return new Date(date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -207,7 +207,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffMins < 60) return `${diffMins} minutes ago`;
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 30) return `${diffDays} days ago`;
@@ -258,10 +258,10 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Main Content - Left Side */}
         <div className="lg:col-span-2 space-y-4">
-          
+
           {/* Collapsible Reply Section */}
           <Card className="border-brand-navy/20">
             <button
@@ -274,7 +274,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
               </div>
               {replyExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </button>
-            
+
             {replyExpanded && (
               <CardContent className="pt-0 border-t">
                 <form onSubmit={handleSubmitComment} className="space-y-4">
@@ -315,14 +315,14 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
                   {/* Submit Buttons */}
                   <div className="flex items-center gap-3 pt-2">
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={!newComment.trim() || submitting}
                       className="bg-brand-navy hover:bg-brand-gold hover:text-brand-navy"
                     >
                       {submitting ? 'Sending...' : 'Submit'}
                     </Button>
-                    <Button 
+                    <Button
                       type="button"
                       variant="outline"
                       onClick={() => {
@@ -341,22 +341,21 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
           {/* Messages/Conversation */}
           <div className="space-y-4">
-            {comments.map((comment) => {
+            {comments.map((comment: any) => {
               const isStaff = comment.userRole === 'admin' || comment.userRole === 'staff';
               const isOwner = comment.userId === user?.id;
-              
+
               return (
-                <Card 
-                  key={comment.id} 
+                <Card
+                  key={comment.id}
                   className={`border-l-4 ${isStaff ? 'border-l-brand-navy' : 'border-l-brand-gold'}`}
                 >
                   <CardContent className="pt-4">
                     {/* Comment Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${
-                          isStaff ? 'bg-brand-navy text-white' : 'bg-brand-gold text-brand-navy'
-                        }`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${isStaff ? 'bg-brand-navy text-white' : 'bg-brand-gold text-brand-navy'
+                          }`}>
                           {comment.userAvatar ? (
                             <img src={comment.userAvatar} alt={comment.userName || 'User'} className="w-full h-full object-cover" />
                           ) : (
@@ -380,7 +379,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                     {/* Comment Content */}
                     <div className="pl-13 ml-10">
                       <p className="text-slate-700 whitespace-pre-wrap">{comment.content}</p>
-                      
+
                       {/* Staff Signature */}
                       {isStaff && (
                         <div className="mt-4 pt-3 border-t border-slate-200 text-sm text-slate-500">
@@ -393,7 +392,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                       {comment.attachmentUrl && (
                         <div className="mt-3 pt-3 border-t border-slate-200">
                           <p className="text-sm font-medium text-slate-600 mb-2">Attachments (1)</p>
-                          <button 
+                          <button
                             onClick={() => handleDownload(comment.attachmentUrl!, `attachment-${comment.id}`)}
                             className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors text-sm"
                           >
@@ -406,7 +405,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                       {/* Star Rating (for staff messages) */}
                       {isStaff && (
                         <div className="mt-3 flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
+                          {[1, 2, 3, 4, 5].map((star: number) => (
                             <Star key={star} className="w-4 h-4 text-slate-300" />
                           ))}
                         </div>
@@ -440,13 +439,13 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                 </div>
                 <div className="pl-13 ml-10">
                   <p className="text-slate-700 whitespace-pre-wrap">{ticket.description}</p>
-                  
+
                   {/* Original Attachments */}
                   {attachments.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-slate-200">
                       <p className="text-sm font-medium text-slate-600 mb-2">Attachments ({attachments.length})</p>
-                      {attachments.map((att) => (
-                        <button 
+                      {attachments.map((att: any) => (
+                        <button
                           key={att.id}
                           onClick={() => handleDownload(att.url, att.name)}
                           className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors text-sm mb-1"
@@ -465,7 +464,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          
+
           {/* Ticket Information Card */}
           <Card>
             <CardHeader className="pb-3">
@@ -514,7 +513,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
 
               {/* Action Buttons */}
               <div className="pt-4 space-y-2">
-                <Button 
+                <Button
                   onClick={() => setReplyExpanded(true)}
                   className="w-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy"
                 >
@@ -534,8 +533,8 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                 <p className="text-sm text-slate-400">No attachments</p>
               ) : (
                 <div className="space-y-2">
-                  {getAllAttachments().map((att, idx) => (
-                    <button 
+                  {getAllAttachments().map((att: any, idx: number) => (
+                    <button
                       key={idx}
                       onClick={() => handleDownload(att.url, att.name)}
                       className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-brand-navy hover:text-brand-gold transition-colors text-sm w-full text-left"
@@ -556,7 +555,7 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                 <CardTitle className="text-lg text-brand-navy">Related Project</CardTitle>
               </CardHeader>
               <CardContent>
-                <Link 
+                <Link
                   href={`/client/projects/${ticket.projectId}`}
                   className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors"
                 >
@@ -583,11 +582,10 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                       {[1, 2, 3, 4, 5].map((star) => (
                         <Star
                           key={star}
-                          className={`w-6 h-6 ${
-                            star <= (ticket.rating || rating)
+                          className={`w-6 h-6 ${star <= (ticket.rating || rating)
                               ? 'text-amber-400 fill-amber-400'
                               : 'text-slate-200'
-                          }`}
+                            }`}
                         />
                       ))}
                     </div>
@@ -609,11 +607,10 @@ export default function TicketDetailPage({ params }: { params: Promise<{ id: str
                           className="p-1 transition-transform hover:scale-110"
                         >
                           <Star
-                            className={`w-8 h-8 transition-colors ${
-                              star <= rating
+                            className={`w-8 h-8 transition-colors ${star <= rating
                                 ? 'text-amber-400 fill-amber-400'
                                 : 'text-slate-200 hover:text-amber-200'
-                            }`}
+                              }`}
                           />
                         </button>
                       ))}

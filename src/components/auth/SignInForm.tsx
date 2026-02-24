@@ -1,12 +1,11 @@
-
 "use client";
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { supabase } from '@/lib/supabase';
+import { signIn as nextAuthSignIn } from 'next-auth/react';
 import { useAuthStore } from '@/store/authStore';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import Image from 'next/image';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 
 const SignInForm: React.FC = () => {
     const router = useRouter();
@@ -29,27 +28,33 @@ const SignInForm: React.FC = () => {
         setLoading(true);
 
         try {
-            const { data, error } = await supabase.auth.signInWithPassword({
+            const result = await nextAuthSignIn('credentials', {
                 email: formData.email,
-                password: formData.password
+                password: formData.password,
+                redirect: false
             });
 
-            if (error) throw error;
+            if (result?.error) {
+                throw new Error("Invalid email or password.");
+            }
 
             // Update store
             await checkAuth();
 
             // Redirect based on role
-            const { role } = useAuthStore.getState();
-            if (role === 'admin') {
-                router.push('/admin');
-            } else if (role === 'staff') {
-                router.push('/staff');
-            } else if (role === 'client') {
-                router.push('/client');
-            } else {
-                router.push('/');
-            }
+            // We use setTimeout because session might take a ms to settle
+            setTimeout(() => {
+                const { role } = useAuthStore.getState();
+                if (role === 'admin') {
+                    router.push('/admin');
+                } else if (role === 'staff') {
+                    router.push('/staff');
+                } else if (role === 'client') {
+                    router.push('/client');
+                } else {
+                    router.push('/');
+                }
+            }, 100);
 
         } catch (err: any) {
             setError(err.message || 'Failed to sign in');

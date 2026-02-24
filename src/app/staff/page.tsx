@@ -66,7 +66,7 @@ export default function StaffDashboard() {
         const result = await updateTaskStatus(taskId, status, projectId);
         if (result.success) {
             // Update local state
-            setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status } : t));
+            setTasks(prev => prev.map((t: any) => t.id === taskId ? { ...t, status } : t));
             if (selectedTask?.id === taskId) {
                 setSelectedTask((prev: any) => ({ ...prev, status }));
             }
@@ -108,7 +108,7 @@ export default function StaffDashboard() {
 
     const getStatusOptions = (currentStatus: string) => {
         const allStatuses = ['todo', 'in_progress', 'review', 'done'];
-        return allStatuses.filter(s => s !== currentStatus);
+        return allStatuses.filter((s: any) => s !== currentStatus);
     };
 
     const handlePostComment = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -127,7 +127,7 @@ export default function StaffDashboard() {
                     { label: 'Active Projects', value: stats?.activeProjects || 0, icon: FolderKanban, color: 'text-blue-600', bg: 'bg-blue-50' },
                     { label: 'Pending', value: stats?.pendingTasks || 0, icon: Clock, color: 'text-purple-600', bg: 'bg-purple-50' },
                     { label: 'Overdue', value: stats?.overdueTasks || 0, icon: AlertTriangle, color: 'text-red-600', bg: 'bg-red-50' },
-                ].map((item, i) => (
+                ].map((item: any, i: number) => (
                     <div key={i} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className={`w-10 h-10 ${item.bg} rounded-lg flex items-center justify-center`}>
                             <item.icon className={`w-5 h-5 ${item.color}`} />
@@ -154,7 +154,7 @@ export default function StaffDashboard() {
 
             {/* Task List */}
             <div className="grid grid-cols-1 gap-4">
-                {tasks.map((task) => (
+                {tasks.map((task: any) => (
                     <div
                         key={task.id}
                         onClick={() => setSelectedTask(task)}
@@ -199,7 +199,7 @@ export default function StaffDashboard() {
                                         <X className="w-4 h-4 rotate-45" />
                                     </button>
                                     <div className="absolute right-0 top-full mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover/dropdown:opacity-100 group-hover/dropdown:visible transition-all z-50 p-2 space-y-1 translate-y-2 group-hover/dropdown:translate-y-0">
-                                        {getStatusOptions(task.status).map((status) => (
+                                        {getStatusOptions(task.status).map((status: any) => (
                                             <button
                                                 key={status}
                                                 onClick={() => handleQuickStatusChange(task.id, task.projectId, status)}
@@ -260,7 +260,7 @@ export default function StaffDashboard() {
                                             { label: 'Due Date', value: selectedTask.dueDate ? new Date(selectedTask.dueDate).toLocaleDateString() : 'Open', icon: Calendar },
                                             { label: 'Status', value: selectedTask.status, icon: Target },
                                             { label: 'Est. Mins', value: selectedTask.estimatedMinutes > 0 ? `${selectedTask.estimatedMinutes}m` : '0', icon: Clock },
-                                        ].map((stat, i) => (
+                                        ].map((stat: any, i: number) => (
                                             <div key={i} className="p-4 bg-slate-50/50 rounded-2xl border border-slate-100 flex flex-col items-center text-center gap-2">
                                                 <stat.icon className="w-4 h-4 text-slate-400" />
                                                 <div>
@@ -301,7 +301,7 @@ export default function StaffDashboard() {
                                                             const res = await updateProjectTask(formData);
                                                             if (res.success) {
                                                                 setSelectedTask({ ...selectedTask, subtasks: newSubtasks });
-                                                                setTasks(prev => prev.map(t => t.id === selectedTask.id ? { ...t, subtasks: newSubtasks } : t));
+                                                                setTasks(prev => prev.map((t: any) => t.id === selectedTask.id ? { ...t, subtasks: newSubtasks } : t));
                                                             }
                                                         }}
                                                         className="flex items-center gap-3 p-4 bg-white border border-slate-100 rounded-xl hover:border-emerald-200 hover:bg-emerald-50/30 transition-all cursor-pointer group shadow-sm"
@@ -354,7 +354,7 @@ export default function StaffDashboard() {
                                     <div className="pt-6 border-t border-slate-100 space-y-3">
                                         <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">Update Status</h3>
                                         <div className="grid grid-cols-2 gap-2">
-                                            {['todo', 'in_progress', 'review', 'done'].map((status) => (
+                                            {['todo', 'in_progress', 'review', 'done'].map((status: any) => (
                                                 <button
                                                     key={status}
                                                     onClick={() => handleQuickStatusChange(selectedTask.id, selectedTask.projectId, status)}

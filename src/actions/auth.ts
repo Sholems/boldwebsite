@@ -1,11 +1,11 @@
-
 'use server'
 
-import { supabaseAdmin } from '@/lib/supabase-admin';
-import { resend } from '@/lib/resend';
 import { db } from '@/lib/db';
-import { users } from '@/lib/db/schema';
-import { eq, count } from 'drizzle-orm';
+import { verificationTokens, users } from '@/lib/db/schema';
+import { eq, count, and } from 'drizzle-orm';
+import { resend } from '@/lib/resend';
+import { signIn } from '@/auth';
+import bcrypt from 'bcryptjs';
 
 /**
  * Server Action to setup the initial Admin account.
@@ -28,43 +28,19 @@ export async function setupAdminAction(formData: FormData) {
             return { error: "System initialized. Redirecting to login...", redirect: '/signin' };
         }
 
-        // 2. Create Auth User (Supabase Admin SDK)
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
+        // 2. Hash Password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // 3. Create User (Drizzle)
+        const [newUser] = await db.insert(users).values({
             email,
-            password,
-            email_confirm: true,
-            user_metadata: { name }
-        });
+            password: passwordHash,
+            role: 'admin',
+            name,
+            isActive: true
+        }).returning();
 
-        if (authError) {
-            // Handle "User already exists" safely
-            if (authError.message.includes("already registered") || authError.status === 400) {
-                return { error: "User exists. Redirecting to login...", redirect: '/signin' };
-            }
-            throw authError;
-        }
-
-        if (!authData.user) throw new Error("Failed to create user in Auth system.");
-
-        // 3. Insert Public User (Drizzle) - Normal Flow
-        // Check if trigger handled it
-        const existingUser = await db.query.users.findFirst({
-            where: eq(users.id, authData.user.id)
-        });
-
-        if (existingUser) {
-            await db.update(users)
-                .set({ role: 'admin', name })
-                .where(eq(users.id, authData.user.id));
-        } else {
-            await db.insert(users).values({
-                id: authData.user.id,
-                email,
-                role: 'admin',
-                name,
-                isActive: true
-            });
-        }
+        if (!newUser) throw new Error("Failed to create admin account.");
 
         return { success: true };
 
@@ -83,7 +59,7 @@ export async function sendPasswordResetAction(email: string) {
     try {
         // 1. Check existence/role using Drizzle
         const user = await db.query.users.findFirst({
-            where: (u, { eq, and }) => and(eq(u.email, email), eq(u.role, 'admin'))
+            where: and(eq(users.email, email), eq(users.role, 'admin'))
         });
 
         if (!user) {
@@ -91,16 +67,17 @@ export async function sendPasswordResetAction(email: string) {
             return { success: true };
         }
 
-        // 2. Generate Link
-        const { data, error } = await supabaseAdmin.auth.admin.generateLink({
-            type: 'recovery',
-            email: email,
-            options: {
-                redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password`
-            }
+        // 2. Generate Native Token
+        const token = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+        const expires = new Date(Date.now() + 3600000); // 1 hour
+
+        await db.insert(verificationTokens).values({
+            identifier: email,
+            token,
+            expires
         });
 
-        if (error || !data.properties?.action_link) throw new Error("Failed to generate link");
+        const resetLink = `${process.env.NEXT_PUBLIC_APP_URL}/auth/reset-password?token=${token}`;
 
         // 3. Send Email via Resend
         await resend.emails.send({
@@ -113,7 +90,7 @@ export async function sendPasswordResetAction(email: string) {
                     <p>An access recovery request was received for the Admin Terminal.</p>
                     <p>Identity: <strong>${email}</strong></p>
                     <br/>
-                    <a href="${data.properties.action_link}" style="background-color: #D4AF37; color: #0A1128; padding: 15px 30px; text-decoration: none; font-weight: bold; display: inline-block;">
+                    <a href="${resetLink}" style="background-color: #D4AF37; color: #0A1128; padding: 15px 30px; text-decoration: none; font-weight: bold; display: inline-block;">
                         ESTABLISH_RECOVERY_UPLINK
                     </a>
                     <br/><br/>
@@ -190,27 +167,13 @@ export async function signUpAction(formData: FormData) {
     }
 
     try {
-        // 1. Create Auth User (Supabase Admin SDK)
-        const { data: authData, error: authError } = await supabaseAdmin.auth.admin.createUser({
-            email,
-            password,
-            email_confirm: true,
-            user_metadata: { name }
-        });
+        // 1. Hash Password
+        const passwordHash = await bcrypt.hash(password, 10);
 
-        if (authError) {
-            if (authError.message.includes("already registered") || authError.status === 400) {
-                return { error: "User already exists. Redirecting to login...", redirect: '/auth/signin' };
-            }
-            throw authError;
-        }
-
-        if (!authData.user) throw new Error("Failed to create user in Auth system.");
-
-        // 2. Insert Public User (Drizzle)
+        // 2. Insert User (Drizzle)
         await db.insert(users).values({
-            id: authData.user.id,
             email,
+            password: passwordHash,
             role: 'user', // Default role for manual signups
             name,
             isActive: true
@@ -223,3 +186,40 @@ export async function signUpAction(formData: FormData) {
         return { success: false, error: error.message };
     }
 }
+
+/**
+ * Server Action to reset password using a token.
+ */
+export async function resetPasswordWithTokenAction(token: string, password: string) {
+    if (!token || !password) return { success: false, error: "Missing required fields." };
+
+    try {
+        // 1. Verify Token
+        const verificationToken = await db.query.verificationTokens.findFirst({
+            where: eq(verificationTokens.token, token)
+        });
+
+        if (!verificationToken || verificationToken.expires < new Date()) {
+            return { success: false, error: "Invalid or expired token." };
+        }
+
+        // 2. Hash New Password
+        const passwordHash = await bcrypt.hash(password, 10);
+
+        // 3. Update User
+        await db.update(users)
+            .set({ password: passwordHash })
+            .where(eq(users.email, verificationToken.identifier));
+
+        // 4. Delete used token
+        await db.delete(verificationTokens).where(eq(verificationTokens.token, token));
+
+        return { success: true };
+
+    } catch (error: any) {
+        console.error("Reset Password Error:", error);
+        return { success: false, error: "System failure." };
+    }
+}
+
+

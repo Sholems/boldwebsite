@@ -28,7 +28,7 @@ export default function ClientProjectsPage() {
     fetchProjects();
   }, [user]);
 
-  const filteredProjects = projects.filter(p =>
+  const filteredProjects = projects.filter((p: any) =>
     p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -86,7 +86,7 @@ export default function ClientProjectsPage() {
         </Card>
       ) : (
         <div className="grid gap-4">
-          {filteredProjects.map((project) => (
+          {filteredProjects.map((project: any) => (
             <Link key={project.id} href={`/client/projects/${project.id}`}>
               <Card className="hover:shadow-md transition-all cursor-pointer group">
                 <CardContent className="pt-6">

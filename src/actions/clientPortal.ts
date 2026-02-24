@@ -35,7 +35,7 @@ export type ProjectFile = {
 export async function getClientProjects(clientId: string) {
   try {
     console.log('🔍 DEBUG getClientProjects: clientId =', clientId);
-    
+
     const projects = await db
       .select({
         id: internalProjects.id,
@@ -57,14 +57,14 @@ export async function getClientProjects(clientId: string) {
 
     // Calculate progress for each project
     const projectsWithProgress = await Promise.all(
-      projects.map(async (project) => {
+      projects.map(async (project: any) => {
         const projectTasks = await db
           .select({ status: tasks.status })
           .from(tasks)
           .where(eq(tasks.projectId, project.id));
 
         const totalTasks = projectTasks.length;
-        const completedTasks = projectTasks.filter(t => t.status === 'done').length;
+        const completedTasks = projectTasks.filter((t: any) => t.status === 'done').length;
         const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
         return {
@@ -122,7 +122,7 @@ export async function getClientProject(projectId: string, clientId: string) {
       .where(eq(tasks.projectId, projectId));
 
     const totalTasks = projectTasks.length;
-    const completedTasks = projectTasks.filter(t => t.status === 'done').length;
+    const completedTasks = projectTasks.filter((t: any) => t.status === 'done').length;
     const progress = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
     return {

@@ -37,7 +37,7 @@ function NewTicketContent() {
     const fetchProjects = async () => {
       if (!user) return;
       const { data } = await getClientProjects(user.id);
-      setProjects(data?.map(p => ({ id: p.id, title: p.title })) || []);
+      setProjects(data?.map((p: any) => ({ id: p.id, title: p.title })) || []);
     };
     fetchProjects();
   }, [user]);
@@ -123,7 +123,7 @@ function NewTicketContent() {
                 Department
               </label>
               <div className="grid grid-cols-4 gap-2">
-                {(['general', 'billing', 'technical', 'sales'] as const).map((dept) => (
+                {(['general', 'billing', 'technical', 'sales'] as const).map((dept: any) => (
                   <button
                     key={dept}
                     type="button"
@@ -154,7 +154,7 @@ function NewTicketContent() {
                 className="w-full p-3 border border-slate-200 rounded-lg text-sm focus:border-brand-navy focus:outline-none focus:ring-1 focus:ring-brand-navy bg-white"
               >
                 <option value="">General Inquiry (No specific project)</option>
-                {projects.map(project => (
+                {projects.map((project: any) => (
                   <option key={project.id} value={project.id}>
                     {project.title}
                   </option>
@@ -171,7 +171,7 @@ function NewTicketContent() {
                 Priority
               </label>
               <div className="grid grid-cols-4 gap-2">
-                {(['low', 'medium', 'high', 'urgent'] as const).map((priority) => (
+                {(['low', 'medium', 'high', 'urgent'] as const).map((priority: any) => (
                   <button
                     key={priority}
                     type="button"

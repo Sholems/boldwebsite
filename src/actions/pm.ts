@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation';
 import { createNotification } from './notifications';
 import { recordActivity } from './activity';
 import { resend } from '@/lib/resend';
+import { uploadFile } from '@/lib/storage';
 
 export async function deleteProject(formData: FormData) {
     const projectId = formData.get('projectId') as string;
@@ -141,26 +142,8 @@ export async function postProjectComment(formData: FormData) {
 
     if (file && file.size > 0 && file.name !== 'undefined') {
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `comment-${Date.now()}.${fileExt}`;
-            const filePath = `comments/${taskId || 'general'}/${fileName}`;
-
-            const arrayBuffer = await file.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-
-            const { error: uploadError } = await supabaseAdmin.storage
-                .from('project-files')
-                .upload(filePath, buffer, {
-                    contentType: file.type,
-                    upsert: true
-                });
-
-            if (!uploadError) {
-                const { data: { publicUrl } } = supabaseAdmin.storage
-                    .from('project-files')
-                    .getPublicUrl(filePath);
-                attachmentUrl = publicUrl;
-            }
+            const url = await uploadFile(file, 'comments');
+            if (url) attachmentUrl = url;
         } catch (err) {
             console.error("Comment File upload error:", err);
         }
@@ -196,7 +179,7 @@ export async function postProjectComment(formData: FormData) {
                 .from(internalProjects)
                 .where(eq(internalProjects.id, projectId))
                 .limit(1);
-            
+
             if (project?.managerId && project.managerId !== userId) {
                 await createNotification(
                     project.managerId,
@@ -214,7 +197,7 @@ export async function postProjectComment(formData: FormData) {
                 .from(tasks)
                 .where(eq(tasks.id, taskId))
                 .limit(1);
-            
+
             if (task?.assigneeId && task.assigneeId !== userId) {
                 await createNotification(
                     task.assigneeId,
@@ -312,7 +295,7 @@ export async function createMilestone(formData: FormData) {
             .from(internalProjects)
             .where(eq(internalProjects.id, projectId))
             .limit(1);
-        
+
         if (project?.managerId) {
             await createNotification(
                 project.managerId,
@@ -361,7 +344,6 @@ export async function getProjectTasks(projectId: string) {
     }
 }
 
-import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function createProjectTask(formData: FormData) {
     const projectId = formData.get('projectId') as string;
@@ -377,34 +359,8 @@ export async function createProjectTask(formData: FormData) {
 
     if (file && file.size > 0 && file.name !== 'undefined') {
         try {
-            const fileExt = file.name.split('.').pop();
-            const fileName = `task-${Date.now()}.${fileExt}`;
-            const filePath = `${projectId || 'standalone'}/${fileName}`;
-
-            // Ensure bucket exists
-            const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-            if (!buckets?.find(b => b.name === 'project-files')) {
-                await supabaseAdmin.storage.createBucket('project-files', { public: true });
-            }
-
-            const arrayBuffer = await file.arrayBuffer();
-            const buffer = Buffer.from(arrayBuffer);
-
-            const { error: uploadError } = await supabaseAdmin.storage
-                .from('project-files')
-                .upload(filePath, buffer, {
-                    contentType: file.type,
-                    upsert: true
-                });
-
-            if (uploadError) {
-                console.error("Task File Upload Error:", uploadError);
-            } else {
-                const { data: { publicUrl } } = supabaseAdmin.storage
-                    .from('project-files')
-                    .getPublicUrl(filePath);
-                attachmentUrl = publicUrl;
-            }
+            const url = await uploadFile(file, projectId || 'standalone');
+            if (url) attachmentUrl = url;
         } catch (err) {
             console.error("File processing error:", err);
         }
@@ -663,7 +619,7 @@ export async function addProjectMember(formData: FormData) {
             .from(internalProjects)
             .where(eq(internalProjects.id, projectId))
             .limit(1);
-        
+
         await createNotification(
             userId,
             'added_to_project',

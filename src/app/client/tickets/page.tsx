@@ -39,9 +39,9 @@ export default function ClientTicketsPage() {
     fetchTickets();
   }, [user]);
 
-  const filteredTickets = filterStatus === 'all' 
-    ? tickets 
-    : tickets.filter(t => t.status === filterStatus);
+  const filteredTickets = filterStatus === 'all'
+    ? tickets
+    : tickets.filter((t: any) => t.status === filterStatus);
 
   const statusColor = (status: string | null) => {
     switch (status) {
@@ -80,9 +80,9 @@ export default function ClientTicketsPage() {
     );
   }
 
-  const openCount = tickets.filter(t => t.status === 'open').length;
-  const inProgressCount = tickets.filter(t => t.status === 'in_progress').length;
-  const resolvedCount = tickets.filter(t => t.status === 'resolved' || t.status === 'closed').length;
+  const openCount = tickets.filter((t: any) => t.status === 'open').length;
+  const inProgressCount = tickets.filter((t: any) => t.status === 'in_progress').length;
+  const resolvedCount = tickets.filter((t: any) => t.status === 'resolved' || t.status === 'closed').length;
 
   return (
     <div className="space-y-8">
@@ -164,7 +164,7 @@ export default function ClientTicketsPage() {
         <div className="flex items-center gap-2">
           <Filter className="w-4 h-4 text-slate-400" />
           <span className="text-sm text-slate-500">Showing: <strong className="text-brand-navy capitalize">{filterStatus.replace('_', ' ')}</strong></span>
-          <button 
+          <button
             onClick={() => setFilterStatus('all')}
             className="text-sm text-brand-navy hover:text-brand-gold underline ml-2"
           >
@@ -180,7 +180,7 @@ export default function ClientTicketsPage() {
             <Ticket className="w-16 h-16 mx-auto mb-4 opacity-20" />
             <p className="text-lg font-medium">No tickets found</p>
             <p className="text-sm mt-2">
-              {filterStatus === 'all' 
+              {filterStatus === 'all'
                 ? "Create your first support ticket to get help from our team"
                 : `No ${filterStatus.replace('_', ' ')} tickets`}
             </p>
@@ -196,7 +196,7 @@ export default function ClientTicketsPage() {
         </Card>
       ) : (
         <div className="space-y-3">
-          {filteredTickets.map((ticket) => (
+          {filteredTickets.map((ticket: any) => (
             <Link key={ticket.id} href={`/client/tickets/${ticket.id}`}>
               <Card className="hover:shadow-md transition-all cursor-pointer border-l-4 border-l-transparent hover:border-l-brand-gold">
                 <CardContent className="py-4">

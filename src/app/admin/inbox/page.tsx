@@ -1,5 +1,6 @@
 
 import { getMessages } from "@/actions/contact";
+export const dynamic = 'force-dynamic';
 import MessageInbox from "@/components/admin/MessageInbox";
 
 export default async function AdminInboxPage() {

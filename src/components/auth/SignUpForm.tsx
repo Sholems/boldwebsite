@@ -25,9 +25,6 @@ export default function SignUpForm() {
         } else {
             setStatus('error');
             setMessage(res.error || 'Failed to sign up');
-            if (res.redirect) {
-                setTimeout(() => router.push(res.redirect!), 2000);
-            }
         }
     }
 

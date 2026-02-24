@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
@@ -55,7 +56,7 @@ export default function StaffInboxPage() {
         const { data } = await getMessages(user.id, conv.partnerId);
         setMessages(data || []);
         // Update unread count locally
-        setConversations(prev => prev.map(c =>
+        setConversations(prev => prev.map((c: any) =>
             c.partnerId === conv.partnerId ? { ...c, unreadCount: 0 } : c
         ));
     };
@@ -102,7 +103,7 @@ export default function StaffInboxPage() {
                                 <p>No messages yet</p>
                             </div>
                         ) : (
-                            conversations.map((conv) => (
+                            conversations.map((conv: any) => (
                                 <div
                                     key={conv.partnerId}
                                     onClick={() => openConversation(conv)}
@@ -154,7 +155,7 @@ export default function StaffInboxPage() {
 
                             {/* Messages */}
                             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-50">
-                                {messages.map((msg) => (
+                                {messages.map((msg: any) => (
                                     <div
                                         key={msg.id}
                                         className={`flex ${msg.senderId === user?.id ? 'justify-end' : 'justify-start'}`}

@@ -129,7 +129,7 @@ export async function updateInvoiceStatus(invoiceId: string, status: string) {
                 'overdue': 'Invoice is now overdue',
                 'cancelled': 'Invoice has been cancelled'
             };
-            
+
             await createNotification(
                 invoice.clientId,
                 'invoice_status_updated',
@@ -193,10 +193,10 @@ export async function updateInvoice(invoiceId: string, data: any, items: any[]) 
 
         // 2. Refresh items: Delete old and insert new (simpler than tracking changes)
         await db.delete(invoiceItems).where(eq(invoiceItems.invoiceId, invoiceId));
-        
+
         if (items.length > 0) {
             await db.insert(invoiceItems).values(
-                items.map(item => ({
+                items.map((item: any) => ({
                     title: item.title,
                     description: item.description,
                     quantity: String(item.quantity),
@@ -228,9 +228,9 @@ export async function deleteInvoice(invoiceId: string) {
     try {
         // Get invoice number first for logging
         const [invoice] = await db.select().from(invoices).where(eq(invoices.id, invoiceId)).limit(1);
-        
+
         await db.delete(invoices).where(eq(invoices.id, invoiceId));
-        
+
         revalidatePath('/admin/finance');
 
         // Log Activity

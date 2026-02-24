@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
@@ -49,8 +50,8 @@ export default function ClientDashboard() {
     );
   }
 
-  const activeProjects = projects.filter(p => p.status === 'active');
-  const completedProjects = projects.filter(p => p.status === 'completed');
+  const activeProjects = projects.filter((p: any) => p.status === 'active');
+  const completedProjects = projects.filter((p: any) => p.status === 'completed');
 
   const statusColor = (status: string | null) => {
     switch (status) {
@@ -133,8 +134,8 @@ export default function ClientDashboard() {
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl font-bold text-brand-navy">Active Projects</h2>
-          <Link 
-            href="/client/projects" 
+          <Link
+            href="/client/projects"
             className="text-sm text-brand-navy hover:text-brand-gold flex items-center gap-1 transition-colors"
           >
             View All <ArrowRight className="w-4 h-4" />
@@ -150,7 +151,7 @@ export default function ClientDashboard() {
           </Card>
         ) : (
           <div className="grid gap-4">
-            {activeProjects.slice(0, 3).map((project) => (
+            {activeProjects.slice(0, 3).map((project: any) => (
               <Link key={project.id} href={`/client/projects/${project.id}`}>
                 <Card className="hover:shadow-md transition-shadow cursor-pointer border-l-4 border-l-brand-gold">
                   <CardContent className="pt-6">
@@ -202,15 +203,15 @@ export default function ClientDashboard() {
                 </tr>
               </thead>
               <tbody>
-                {invoices.slice(0, 5).map((inv) => (
+                {invoices.slice(0, 5).map((inv: any) => (
                   <tr key={inv.id} className="border-b last:border-0 hover:bg-slate-50">
                     <td className="p-4 font-mono text-xs text-slate-500">#{inv.id.slice(0, 8)}</td>
                     <td className="p-4 font-bold text-brand-navy">${inv.totalAmount}</td>
                     <td className="p-4">
                       <Badge className={
                         inv.status === 'paid' ? 'bg-emerald-100 text-emerald-700' :
-                        inv.status === 'overdue' ? 'bg-red-100 text-red-700' :
-                        'bg-amber-100 text-amber-700'
+                          inv.status === 'overdue' ? 'bg-red-100 text-red-700' :
+                            'bg-amber-100 text-amber-700'
                       }>
                         {inv.status}
                       </Badge>

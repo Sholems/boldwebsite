@@ -14,7 +14,7 @@ export async function getStaffProjects(userId: string) {
             .from(projectMembers)
             .where(eq(projectMembers.userId, userId));
 
-        const projectIds = memberProjects.map(m => m.projectId);
+        const projectIds = memberProjects.map((m: any) => m.projectId);
 
         if (projectIds.length === 0) {
             return { success: true, data: [] };
@@ -22,7 +22,7 @@ export async function getStaffProjects(userId: string) {
 
         // Get project details with task count
         const projectsWithDetails = await Promise.all(
-            projectIds.map(async (projectId) => {
+            projectIds.map(async (projectId: string) => {
                 const [project] = await db.select({
                     id: internalProjects.id,
                     title: internalProjects.title,
@@ -60,7 +60,7 @@ export async function getStaffProjects(userId: string) {
             })
         );
 
-        const validProjects = projectsWithDetails.filter(p => p !== null);
+        const validProjects = projectsWithDetails.filter((p: any) => p !== null);
 
         return { success: true, data: validProjects };
     } catch (error) {

@@ -74,7 +74,7 @@ export async function getTotalTaskTime(taskId: string) {
             .from(timeLogs)
             .where(eq(timeLogs.taskId, taskId));
 
-        const totalSeconds = logs.reduce((acc, log) => {
+        const totalSeconds = logs.reduce((acc: number, log: any) => {
             return acc + (log.duration ? parseInt(log.duration) : 0);
         }, 0);
 

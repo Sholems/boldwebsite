@@ -10,12 +10,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  ArrowLeft, 
-  CheckCircle2, 
-  Clock, 
-  FileText, 
-  Download, 
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Clock,
+  FileText,
+  Download,
   Calendar,
   User,
   ListTodo,
@@ -83,7 +83,7 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
       setLoading(true);
 
       const projectRes = await getClientProject(id, user.id);
-      
+
       if (!projectRes.success) {
         setError(projectRes.error || 'Failed to load project');
         setLoading(false);
@@ -163,10 +163,10 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
   }
 
   const tasksByStatus = {
-    todo: tasks.filter(t => t.status === 'todo'),
-    in_progress: tasks.filter(t => t.status === 'in_progress'),
-    review: tasks.filter(t => t.status === 'review'),
-    done: tasks.filter(t => t.status === 'done'),
+    todo: tasks.filter((t: any) => t.status === 'todo'),
+    in_progress: tasks.filter((t: any) => t.status === 'in_progress'),
+    review: tasks.filter((t: any) => t.status === 'review'),
+    done: tasks.filter((t: any) => t.status === 'done'),
   };
 
   return (
@@ -263,29 +263,29 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
       {/* Tabs: Tasks, Milestones, Files */}
       <Tabs defaultValue="tasks" className="w-full">
         <TabsList className="bg-transparent border-b w-full justify-start rounded-none h-auto p-0">
-          <TabsTrigger 
-            value="tasks" 
+          <TabsTrigger
+            value="tasks"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-brand-navy data-[state=active]:bg-transparent px-6 py-3"
           >
             <ListTodo className="w-4 h-4 mr-2" />
             Tasks ({tasks.length})
           </TabsTrigger>
-          <TabsTrigger 
-            value="milestones" 
+          <TabsTrigger
+            value="milestones"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-brand-navy data-[state=active]:bg-transparent px-6 py-3"
           >
             <Milestone className="w-4 h-4 mr-2" />
             Milestones ({milestones.length})
           </TabsTrigger>
-          <TabsTrigger 
-            value="files" 
+          <TabsTrigger
+            value="files"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-brand-navy data-[state=active]:bg-transparent px-6 py-3"
           >
             <Files className="w-4 h-4 mr-2" />
             Files ({files.length})
           </TabsTrigger>
-          <TabsTrigger 
-            value="tickets" 
+          <TabsTrigger
+            value="tickets"
             className="rounded-none border-b-2 border-transparent data-[state=active]:border-brand-navy data-[state=active]:bg-transparent px-6 py-3"
           >
             <Ticket className="w-4 h-4 mr-2" />
@@ -312,7 +312,7 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
                     </CardTitle>
                   </CardHeader>
                   <CardContent className="space-y-2">
-                    {tasksByStatus[status].map((task) => (
+                    {tasksByStatus[status].map((task: any) => (
                       <div key={task.id} className="bg-white p-3 rounded-lg border shadow-sm">
                         <p className="font-medium text-sm text-brand-navy">{task.title}</p>
                         <div className="flex items-center justify-between mt-2 text-xs">
@@ -349,7 +349,7 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
           ) : (
             <Card>
               <CardContent className="divide-y">
-                {milestones.map((ms) => (
+                {milestones.map((ms: any) => (
                   <div key={ms.id} className="py-4 flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       {ms.status === 'completed' ? (
@@ -401,7 +401,7 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
                     </tr>
                   </thead>
                   <tbody>
-                    {files.map((file) => (
+                    {files.map((file: any) => (
                       <tr key={file.id} className="border-b last:border-0 hover:bg-slate-50">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -442,8 +442,8 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
         <TabsContent value="tickets" className="mt-6">
           <div className="flex justify-between items-center mb-4">
             <p className="text-sm text-slate-500">
-              {tickets.length === 0 
-                ? 'No tickets for this project yet' 
+              {tickets.length === 0
+                ? 'No tickets for this project yet'
                 : `${tickets.length} ticket${tickets.length > 1 ? 's' : ''} for this project`}
             </p>
             <Link href={`/client/tickets/new?project=${id}`}>
@@ -470,15 +470,14 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
                     <CardContent className="py-4">
                       <div className="flex items-start justify-between gap-4">
                         <div className="flex items-start gap-4 flex-1">
-                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-                            ticket.status === 'open' ? 'bg-blue-100 text-blue-600' :
+                          <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${ticket.status === 'open' ? 'bg-blue-100 text-blue-600' :
                             ticket.status === 'in_progress' ? 'bg-amber-100 text-amber-600' :
-                            ticket.status === 'resolved' ? 'bg-emerald-100 text-emerald-600' :
-                            'bg-slate-100 text-slate-600'
-                          }`}>
+                              ticket.status === 'resolved' ? 'bg-emerald-100 text-emerald-600' :
+                                'bg-slate-100 text-slate-600'
+                            }`}>
                             {ticket.status === 'open' ? <AlertCircle className="w-5 h-5" /> :
-                             ticket.status === 'in_progress' ? <Clock className="w-5 h-5" /> :
-                             <CheckCircle2 className="w-5 h-5" />}
+                              ticket.status === 'in_progress' ? <Clock className="w-5 h-5" /> :
+                                <CheckCircle2 className="w-5 h-5" />}
                           </div>
                           <div className="flex-1 min-w-0">
                             <h3 className="font-bold text-brand-navy truncate">{ticket.subject}</h3>
@@ -493,17 +492,17 @@ export default function ClientProjectDetailPage({ params }: { params: Promise<{ 
                         <div className="flex flex-col items-end gap-2">
                           <Badge className={
                             ticket.status === 'open' ? 'bg-blue-100 text-blue-700' :
-                            ticket.status === 'in_progress' ? 'bg-amber-100 text-amber-700' :
-                            ticket.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' :
-                            'bg-slate-100 text-slate-600'
+                              ticket.status === 'in_progress' ? 'bg-amber-100 text-amber-700' :
+                                ticket.status === 'resolved' ? 'bg-emerald-100 text-emerald-700' :
+                                  'bg-slate-100 text-slate-600'
                           }>
                             {ticket.status?.replace('_', ' ')}
                           </Badge>
                           <Badge variant="outline" className={
                             ticket.priority === 'urgent' ? 'bg-red-100 text-red-700 border-red-200' :
-                            ticket.priority === 'high' ? 'bg-orange-100 text-orange-700 border-orange-200' :
-                            ticket.priority === 'medium' ? 'bg-amber-100 text-amber-700 border-amber-200' :
-                            'bg-slate-100 text-slate-600 border-slate-200'
+                              ticket.priority === 'high' ? 'bg-orange-100 text-orange-700 border-orange-200' :
+                                ticket.priority === 'medium' ? 'bg-amber-100 text-amber-700 border-amber-200' :
+                                  'bg-slate-100 text-slate-600 border-slate-200'
                           }>
                             {ticket.priority}
                           </Badge>

@@ -17,10 +17,10 @@ export async function getInternalProjects(clientId?: string) {
         const projData = await query.orderBy(desc(internalProjects.createdAt));
 
         // Augment with task counts for progress calculation
-        const data = await Promise.all(projData.map(async (project) => {
+        const data = await Promise.all(projData.map(async (project: any) => {
             const projectTasks = await db.select().from(tasks).where(eq(tasks.projectId, project.id));
             const totalTasks = projectTasks.length;
-            const completedTasks = projectTasks.filter(t => t.status === 'done').length;
+            const completedTasks = projectTasks.filter((t: any) => t.status === 'done').length;
             return {
                 ...project,
                 totalTasks,

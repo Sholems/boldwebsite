@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "AI Digital Marketing & Automation Agency based in Lagos, Nigeria.",
 };
 
+import AuthProvider from "@/components/providers/AuthProvider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -23,8 +25,10 @@ export default function RootLayout({
       <body
         className={`${inter.variable} antialiased text-slate-800`}
       >
-        {children}
-        <AdminInitCheck />
+        <AuthProvider>
+          {children}
+          <AdminInitCheck />
+        </AuthProvider>
       </body>
     </html>
   );

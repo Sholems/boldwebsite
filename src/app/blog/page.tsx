@@ -5,7 +5,7 @@ export default async function BlogIndexRoute() {
     const { data: posts } = await getPosts();
 
     // Filter for published posts only (unless you want to show drafts too, but usually not)
-    const publishedPosts = posts?.filter(post => post.status === 'published') || [];
+    const publishedPosts = posts?.filter((post: any) => post.status === 'published') || [];
 
     return <BlogIndexPage posts={publishedPosts} />;
 }

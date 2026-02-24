@@ -1,4 +1,4 @@
-
+import { Suspense } from 'react';
 import ResetPasswordForm from "@/components/auth/ResetPasswordForm";
 
 export const metadata = {
@@ -9,13 +9,15 @@ export const metadata = {
 export default function ResetPasswordPage() {
     return (
         <div className="min-h-screen bg-brand-navy flex items-center justify-center p-4 relative overflow-hidden">
-             {/* Grid Background */}
-             <div className="absolute inset-0 opacity-[0.05] pointer-events-none" 
+            {/* Grid Background */}
+            <div className="absolute inset-0 opacity-[0.05] pointer-events-none"
                 style={{ backgroundImage: 'linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px)', backgroundSize: '40px 40px' }}>
             </div>
-            
+
             <div className="relative z-10 w-full">
-                <ResetPasswordForm />
+                <Suspense fallback={<div className="text-white text-center font-mono text-xs animate-pulse">BOOTING_RECOVERY_UI...</div>}>
+                    <ResetPasswordForm />
+                </Suspense>
             </div>
         </div>
     );

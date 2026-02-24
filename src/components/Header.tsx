@@ -119,7 +119,7 @@ const Header: React.FC = () => {
 		const isActive = pathname === linkHref || (linkHref !== '/' && pathname.startsWith(linkHref));
 		if (isActive) return 'text-brand-gold';
 
-		return 'text-brand-navy/60 hover:tefxt-brand-gold';
+		return 'text-brand-navy/60 hover:text-brand-gold';
 	};
 
 	const getAuthBtnClass = () => {

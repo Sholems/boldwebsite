@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
@@ -65,7 +66,7 @@ export default function AdminMessagesPage() {
     const fetchAllUsers = async () => {
         const { data } = await getUsers();
         // Filter out current user
-        setAllUsers((data || []).filter((u: User) => u.id !== user?.id));
+        setAllUsers((data || []).filter((u: any) => u.id !== user?.id));
     };
 
     const openConversation = async (conv: Conversation) => {
@@ -73,7 +74,7 @@ export default function AdminMessagesPage() {
         setSelectedConversation(conv);
         const { data } = await getMessages(user.id, conv.partnerId);
         setMessages(data || []);
-        setConversations(prev => prev.map(c =>
+        setConversations(prev => prev.map((c: any) =>
             c.partnerId === conv.partnerId ? { ...c, unreadCount: 0 } : c
         ));
     };

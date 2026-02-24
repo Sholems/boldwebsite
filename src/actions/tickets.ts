@@ -5,7 +5,7 @@ import { tickets, ticketAttachments, ticketComments, cannedResponses, ticketActi
 import { eq, desc, and, or, isNull } from 'drizzle-orm';
 import { revalidatePath } from 'next/cache';
 import { createNotification } from './notifications';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { uploadFile } from '@/lib/storage';
 
 // Types
 export type TicketPriority = 'low' | 'medium' | 'high' | 'urgent';
@@ -53,41 +53,16 @@ export async function createTicket(clientId: string, data: CreateTicketData, fil
     // Handle file upload if present
     if (file && file.size > 0) {
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `ticket-${newTicket.id}-${Date.now()}.${fileExt}`;
-        const filePath = `tickets/${newTicket.id}/${fileName}`;
-
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        // Ensure bucket exists
-        const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-        if (!buckets?.find(b => b.name === 'ticket-files')) {
-          await supabaseAdmin.storage.createBucket('ticket-files', { public: true });
-        }
-
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from('ticket-files')
-          .upload(filePath, buffer, {
-            contentType: file.type,
-            upsert: true
-          });
-
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabaseAdmin.storage
-            .from('ticket-files')
-            .getPublicUrl(filePath);
-
+        const url = await uploadFile(file, `tickets/${newTicket.id}`);
+        if (url) {
           // Add attachment record
           await db.insert(ticketAttachments).values({
             ticketId: newTicket.id,
             name: file.name,
-            url: publicUrl,
+            url,
             sizeBytes: file.size,
             uploadedBy: clientId,
           });
-        } else {
-          console.error('Ticket file upload error:', uploadError);
         }
       } catch (uploadErr) {
         console.error('File processing error:', uploadErr);
@@ -125,7 +100,7 @@ export async function createTicket(clientId: string, data: CreateTicketData, fil
 export async function getClientTickets(clientId: string, projectId?: string) {
   try {
     const conditions = [eq(tickets.clientId, clientId)];
-    
+
     if (projectId) {
       conditions.push(eq(tickets.projectId, projectId));
     }
@@ -163,7 +138,7 @@ export async function getClientTickets(clientId: string, projectId?: string) {
 export async function getTicket(ticketId: string, userId: string, isAdmin = false) {
   try {
     const conditions = [eq(tickets.id, ticketId)];
-    
+
     // Non-admins can only see their own tickets
     if (!isAdmin) {
       conditions.push(eq(tickets.clientId, userId));
@@ -211,15 +186,15 @@ export async function getTicket(ticketId: string, userId: string, isAdmin = fals
       .from(users)
       .where(eq(users.id, ticket.clientId));
 
-    return { 
-      success: true, 
-      data: { 
-        ...ticket, 
+    return {
+      success: true,
+      data: {
+        ...ticket,
         assignedToName: assignedUser?.name || assignedUser?.email,
         assignedToAvatar: assignedUser?.avatarUrl,
         clientName: client?.name || client?.email,
         clientAvatar: client?.avatarUrl,
-      } 
+      }
     };
   } catch (error) {
     console.error('getTicket error:', error);
@@ -271,7 +246,7 @@ export async function getAllTickets(filters?: { status?: string; priority?: stri
 
     // Fetch assigned names and client names
     const enrichedTickets = await Promise.all(
-      ticketList.map(async (ticket) => {
+      ticketList.map(async (ticket: any) => {
         let assignedToName = null;
         let clientName = null;
 
@@ -429,8 +404,8 @@ export async function getStaffForAssignment() {
       email: users.email,
       role: users.role,
     })
-    .from(users)
-    .where(or(eq(users.role, 'admin'), eq(users.role, 'staff')));
+      .from(users)
+      .where(or(eq(users.role, 'admin'), eq(users.role, 'staff')));
 
     return { success: true, data: staff };
   } catch (error) {
@@ -445,7 +420,7 @@ export async function getStaffForAssignment() {
 export async function getTicketComments(ticketId: string, includeInternal = false) {
   try {
     const conditions = [eq(ticketComments.ticketId, ticketId)];
-    
+
     // Filter out internal comments for clients
     if (!includeInternal) {
       conditions.push(eq(ticketComments.isInternal, false));
@@ -480,9 +455,9 @@ export async function getTicketComments(ticketId: string, includeInternal = fals
  * Post a comment on a ticket
  */
 export async function postTicketComment(
-  ticketId: string, 
-  userId: string, 
-  content: string, 
+  ticketId: string,
+  userId: string,
+  content: string,
   isInternal = false,
   file?: File
 ) {
@@ -492,34 +467,10 @@ export async function postTicketComment(
     // Handle file upload if present
     if (file && file.size > 0) {
       try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `comment-${Date.now()}.${fileExt}`;
-        const filePath = `tickets/${ticketId}/comments/${fileName}`;
-
-        const arrayBuffer = await file.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-
-        // Ensure bucket exists
-        const { data: buckets } = await supabaseAdmin.storage.listBuckets();
-        if (!buckets?.find(b => b.name === 'ticket-files')) {
-          await supabaseAdmin.storage.createBucket('ticket-files', { public: true });
-        }
-
-        const { error: uploadError } = await supabaseAdmin.storage
-          .from('ticket-files')
-          .upload(filePath, buffer, {
-            contentType: file.type,
-            upsert: true
-          });
-
-        if (!uploadError) {
-          const { data: { publicUrl } } = supabaseAdmin.storage
-            .from('ticket-files')
-            .getPublicUrl(filePath);
-          attachmentUrl = publicUrl;
+        const url = await uploadFile(file, `tickets/${ticketId}/comments`);
+        if (url) {
+          attachmentUrl = url;
           console.log('Attachment uploaded successfully:', attachmentUrl);
-        } else {
-          console.error('Attachment upload error:', uploadError);
         }
       } catch (uploadErr) {
         console.error('Comment file upload error:', uploadErr);
@@ -535,8 +486,8 @@ export async function postTicketComment(
     });
 
     // Get ticket and user info for notification
-    const [ticket] = await db.select({ 
-      clientId: tickets.clientId, 
+    const [ticket] = await db.select({
+      clientId: tickets.clientId,
       assignedTo: tickets.assignedTo,
       subject: tickets.subject,
       firstResponseAt: tickets.firstResponseAt
@@ -552,14 +503,14 @@ export async function postTicketComment(
     if (!isInternal && ticket) {
       const isStaff = commenter?.role === 'admin' || commenter?.role === 'staff';
       const newStatus = isStaff ? 'awaiting_reply' : 'open';
-      
+
       // Update status and first response time if staff's first response
       const updateData: any = { status: newStatus, updatedAt: new Date() };
-      
+
       if (isStaff && !ticket.firstResponseAt) {
         updateData.firstResponseAt = new Date();
       }
-      
+
       await db.update(tickets)
         .set(updateData)
         .where(eq(tickets.id, ticketId));
@@ -675,7 +626,7 @@ export async function getTicketActivity(ticketId: string) {
 export async function getCannedResponses(department?: string) {
   try {
     let query = db.select().from(cannedResponses);
-    
+
     if (department) {
       query = query.where(
         or(
@@ -684,7 +635,7 @@ export async function getCannedResponses(department?: string) {
         )
       ) as any;
     }
-    
+
     const responses = await query.orderBy(cannedResponses.title);
     return { success: true, data: responses };
   } catch (error) {
@@ -757,7 +708,7 @@ export async function submitTicketRating(
     }
 
     await db.update(tickets)
-      .set({ 
+      .set({
         rating,
         ratingComment: comment || null,
         status: 'closed', // Close ticket after rating

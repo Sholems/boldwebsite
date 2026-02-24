@@ -69,7 +69,7 @@ export async function recordPayment(data: {
         const admins = await db.select({ id: users.id })
             .from(users)
             .where(eq(users.role, 'admin'));
-        
+
         for (const admin of admins) {
             await createNotification(
                 admin.id,
@@ -126,7 +126,7 @@ export async function createReceipt(data: {
             .from(invoices)
             .where(eq(invoices.id, data.invoiceId))
             .limit(1);
-        
+
         if (invoice?.clientId) {
             await createNotification(
                 invoice.clientId,
@@ -205,7 +205,7 @@ export async function createExpense(data: {
         const admins = await db.select({ id: users.id })
             .from(users)
             .where(eq(users.role, 'admin'));
-        
+
         for (const admin of admins) {
             await createNotification(
                 admin.id,
@@ -332,29 +332,29 @@ export async function getFinanceAnalytics(year?: number) {
 
         // Calculate metrics
         const totalRevenue = currentYearInvoices
-            .filter(i => i.status === 'paid')
-            .reduce((sum, i) => sum + parseFloat(i.totalAmount || '0'), 0);
+            .filter((i: any) => i.status === 'paid')
+            .reduce((sum: number, i: any) => sum + parseFloat(i.totalAmount || '0'), 0);
 
         const totalExpenses = currentYearExpenses
-            .reduce((sum, e) => sum + parseFloat(e.amount || '0'), 0);
+            .reduce((sum: number, e: any) => sum + parseFloat(e.amount || '0'), 0);
 
         const outstanding = currentYearInvoices
-            .filter(i => i.status !== 'paid' && i.status !== 'cancelled')
-            .reduce((sum, i) => sum + parseFloat(i.totalAmount || '0'), 0);
+            .filter((i: any) => i.status !== 'paid' && i.status !== 'cancelled')
+            .reduce((sum: number, i: any) => sum + parseFloat(i.totalAmount || '0'), 0);
 
         const lastYearRevenue = lastYearInvoices
-            .filter(i => i.status === 'paid')
-            .reduce((sum, i) => sum + parseFloat(i.totalAmount || '0'), 0);
+            .filter((i: any) => i.status === 'paid')
+            .reduce((sum: number, i: any) => sum + parseFloat(i.totalAmount || '0'), 0);
 
         // Monthly revenue breakdown
         const monthlyRevenue = Array.from({ length: 12 }, (_, i) => {
-            const monthInvoices = currentYearInvoices.filter(inv => {
+            const monthInvoices = currentYearInvoices.filter((inv: any) => {
                 const d = new Date(inv.paidAt || inv.createdAt || '');
                 return d.getMonth() === i && inv.status === 'paid';
             });
             return {
                 month: i,
-                revenue: monthInvoices.reduce((sum, inv) => sum + parseFloat(inv.totalAmount || '0'), 0)
+                revenue: monthInvoices.reduce((sum: number, inv: any) => sum + parseFloat(inv.totalAmount || '0'), 0)
             };
         });
 
@@ -371,9 +371,9 @@ export async function getFinanceAnalytics(year?: number) {
                 netProfit: totalRevenue - totalExpenses,
                 outstanding,
                 invoiceCount: currentYearInvoices.length,
-                paidCount: currentYearInvoices.filter(i => i.status === 'paid').length,
-                pendingCount: currentYearInvoices.filter(i => i.status === 'sent' || i.status === 'draft').length,
-                overdueCount: currentYearInvoices.filter(i => i.status === 'overdue').length,
+                paidCount: currentYearInvoices.filter((i: any) => i.status === 'paid').length,
+                pendingCount: currentYearInvoices.filter((i: any) => i.status === 'sent' || i.status === 'draft').length,
+                overdueCount: currentYearInvoices.filter((i: any) => i.status === 'overdue').length,
                 monthlyRevenue,
                 yoyGrowth,
                 lastYearRevenue,

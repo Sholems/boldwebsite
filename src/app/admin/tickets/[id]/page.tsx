@@ -9,12 +9,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  ArrowLeft, 
-  Clock, 
-  User, 
-  Calendar, 
-  FolderKanban, 
+import {
+  ArrowLeft,
+  Clock,
+  User,
+  Calendar,
+  FolderKanban,
   FileText,
   Download,
   AlertCircle,
@@ -90,7 +90,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [cannedResponses, setCannedResponses] = useState<{id: string; title: string; content: string}[]>([]);
+  const [cannedResponses, setCannedResponses] = useState<{ id: string; title: string; content: string }[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [newComment, setNewComment] = useState('');
@@ -101,7 +101,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
   const fetchData = async () => {
     setLoading(true);
-    
+
     const [ticketRes, attachmentsRes, staffRes, commentsRes, cannedRes] = await Promise.all([
       getTicket(id, '', true),
       getTicketAttachments(id),
@@ -109,7 +109,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
       getTicketComments(id, true),
       getCannedResponses(),
     ]);
-    
+
     if (!ticketRes.success) {
       setError(ticketRes.error || 'Failed to load ticket');
       setLoading(false);
@@ -135,7 +135,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
     setSelectedFile(null);
     setReplyExpanded(false);
     setSubmitting(false);
-    
+
     const { data } = await getTicketComments(id, true);
     setComments(data || []);
     fetchData();
@@ -172,13 +172,13 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
   // Get all attachments (from ticket + comments)
   const getAllAttachments = () => {
-    const ticketAtts = attachments.map(a => ({ name: a.name, url: a.url, source: 'ticket' }));
+    const ticketAtts = attachments.map((a: any) => ({ name: a.name, url: a.url, source: 'ticket' }));
     const commentAtts = comments
-      .filter(c => c.attachmentUrl)
-      .map(c => ({ 
-        name: `Attachment from ${c.userName || 'User'}`, 
-        url: c.attachmentUrl!, 
-        source: 'comment' 
+      .filter((c: any) => c.attachmentUrl)
+      .map((c: any) => ({
+        name: `Attachment from ${c.userName || 'User'}`,
+        url: c.attachmentUrl!,
+        source: 'comment'
       }));
     return [...ticketAtts, ...commentAtts];
   };
@@ -215,9 +215,9 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
   const formatDate = (date: Date | null) => {
     if (!date) return '-';
-    return new Date(date).toLocaleDateString('en-US', { 
-      month: '2-digit', 
-      day: '2-digit', 
+    return new Date(date).toLocaleDateString('en-US', {
+      month: '2-digit',
+      day: '2-digit',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -232,7 +232,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
     const diffMins = Math.floor(diffMs / 60000);
     const diffHours = Math.floor(diffMins / 60);
     const diffDays = Math.floor(diffHours / 24);
-    
+
     if (diffMins < 60) return `${diffMins} minutes ago`;
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 30) return `${diffDays} days ago`;
@@ -289,10 +289,10 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
+
         {/* Main Content - Left Side */}
         <div className="lg:col-span-2 space-y-4">
-          
+
           {/* Collapsible Reply Section */}
           <Card className="border-brand-navy/20">
             <button
@@ -305,7 +305,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
               </div>
               {replyExpanded ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </button>
-            
+
             {replyExpanded && (
               <CardContent className="pt-0 border-t">
                 <form onSubmit={handleSubmitComment} className="space-y-4">
@@ -323,7 +323,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                         defaultValue=""
                       >
                         <option value="" disabled>Select a canned response...</option>
-                        {cannedResponses.map(r => (
+                        {cannedResponses.map((r: any) => (
                           <option key={r.id} value={r.id}>{r.title}</option>
                         ))}
                       </select>
@@ -379,14 +379,14 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
                   {/* Submit Buttons */}
                   <div className="flex items-center gap-3 pt-2">
-                    <Button 
-                      type="submit" 
+                    <Button
+                      type="submit"
                       disabled={!newComment.trim() || submitting}
                       className="bg-brand-navy hover:bg-brand-gold hover:text-brand-navy"
                     >
                       {submitting ? 'Sending...' : 'Submit'}
                     </Button>
-                    <Button 
+                    <Button
                       type="button"
                       variant="outline"
                       onClick={() => {
@@ -405,28 +405,26 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
           {/* Messages/Conversation */}
           <div className="space-y-4">
-            {comments.map((comment) => {
+            {comments.map((comment: any) => {
               const isStaff = comment.userRole === 'admin' || comment.userRole === 'staff';
               const isClientComment = comment.userId === ticket.clientId;
-              
+
               return (
-                <Card 
-                  key={comment.id} 
-                  className={`border-l-4 ${
-                    comment.isInternal 
-                      ? 'border-l-amber-400 bg-amber-50' 
-                      : isStaff 
-                        ? 'border-l-brand-navy' 
+                <Card
+                  key={comment.id}
+                  className={`border-l-4 ${comment.isInternal
+                      ? 'border-l-amber-400 bg-amber-50'
+                      : isStaff
+                        ? 'border-l-brand-navy'
                         : 'border-l-brand-gold'
-                  }`}
+                    }`}
                 >
                   <CardContent className="pt-4">
                     {/* Comment Header */}
                     <div className="flex items-start justify-between mb-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${
-                          comment.isInternal ? 'bg-amber-100 text-amber-600' : isStaff ? 'bg-brand-navy text-white' : 'bg-brand-gold text-brand-navy'
-                        }`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center overflow-hidden ${comment.isInternal ? 'bg-amber-100 text-amber-600' : isStaff ? 'bg-brand-navy text-white' : 'bg-brand-gold text-brand-navy'
+                          }`}>
                           {comment.userAvatar ? (
                             <img src={comment.userAvatar} alt={comment.userName || 'User'} className="w-full h-full object-cover" />
                           ) : (
@@ -456,7 +454,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                     {/* Comment Content */}
                     <div className="pl-13 ml-10">
                       <p className="text-slate-700 whitespace-pre-wrap">{comment.content}</p>
-                      
+
                       {/* Staff Signature */}
                       {isStaff && !comment.isInternal && (
                         <div className="mt-4 pt-3 border-t border-slate-200 text-sm text-slate-500">
@@ -469,7 +467,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                       {comment.attachmentUrl && (
                         <div className="mt-3 pt-3 border-t border-slate-200">
                           <p className="text-sm font-medium text-slate-600 mb-2">Attachments (1)</p>
-                          <button 
+                          <button
                             onClick={() => handleDownload(comment.attachmentUrl!, `attachment-${comment.id}`)}
                             className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors text-sm"
                           >
@@ -482,7 +480,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                       {/* Star Rating (for staff messages) */}
                       {isStaff && !comment.isInternal && (
                         <div className="mt-3 flex items-center gap-1">
-                          {[1, 2, 3, 4, 5].map((star) => (
+                          {[1, 2, 3, 4, 5].map((star: any) => (
                             <Star key={star} className="w-4 h-4 text-slate-300" />
                           ))}
                         </div>
@@ -516,13 +514,13 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                 </div>
                 <div className="pl-13 ml-10">
                   <p className="text-slate-700 whitespace-pre-wrap">{ticket.description}</p>
-                  
+
                   {/* Original Attachments */}
                   {attachments.length > 0 && (
                     <div className="mt-4 pt-3 border-t border-slate-200">
                       <p className="text-sm font-medium text-slate-600 mb-2">Attachments ({attachments.length})</p>
-                      {attachments.map((att) => (
-                        <button 
+                      {attachments.map((att: any) => (
+                        <button
                           key={att.id}
                           onClick={() => handleDownload(att.url, att.name)}
                           className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors text-sm mb-1"
@@ -541,7 +539,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
 
         {/* Right Sidebar */}
         <div className="lg:col-span-1 space-y-4">
-          
+
           {/* Ticket Information Card */}
           <Card>
             <CardHeader className="pb-3">
@@ -572,7 +570,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                   className="w-full p-2 border border-slate-200 rounded-lg text-sm bg-white"
                 >
                   <option value="">Unassigned</option>
-                  {staff.map((s) => (
+                  {staff.map((s: any) => (
                     <option key={s.id} value={s.id}>{s.name || s.email}</option>
                   ))}
                 </select>
@@ -607,25 +605,24 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
               <div>
                 <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">SLA Status</p>
                 <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${
-                    sla.status === 'overdue' ? 'bg-red-500' :
-                    sla.status === 'warning' ? 'bg-amber-500' :
-                    'bg-emerald-500'
-                  }`} />
+                  <div className={`w-3 h-3 rounded-full ${sla.status === 'overdue' ? 'bg-red-500' :
+                      sla.status === 'warning' ? 'bg-amber-500' :
+                        'bg-emerald-500'
+                    }`} />
                   <span className="text-sm capitalize">{sla.status} ({Math.round(sla.percentUsed)}%)</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
               <div className="pt-4 space-y-2">
-                <Button 
+                <Button
                   onClick={() => setReplyExpanded(true)}
                   className="w-full bg-brand-navy hover:bg-brand-gold hover:text-brand-navy"
                 >
                   Reply
                 </Button>
                 {ticket.status !== 'closed' && (
-                  <Button 
+                  <Button
                     onClick={() => handleStatusChange('closed')}
                     variant="outline"
                     className="w-full border-red-300 text-red-600 hover:bg-red-50"
@@ -664,8 +661,8 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                 <p className="text-sm text-slate-400">No attachments</p>
               ) : (
                 <div className="space-y-2">
-                  {getAllAttachments().map((att, idx) => (
-                    <button 
+                  {getAllAttachments().map((att: any, idx: number) => (
+                    <button
                       key={idx}
                       onClick={() => handleDownload(att.url, att.name)}
                       className="flex items-center gap-2 p-2 rounded-lg hover:bg-slate-50 text-brand-navy hover:text-brand-gold transition-colors text-sm w-full text-left"
@@ -686,7 +683,7 @@ export default function AdminTicketDetailPage({ params }: { params: Promise<{ id
                 <CardTitle className="text-lg text-brand-navy">Related Project</CardTitle>
               </CardHeader>
               <CardContent>
-                <Link 
+                <Link
                   href={`/admin/projects/${ticket.projectId}`}
                   className="flex items-center gap-2 text-brand-navy hover:text-brand-gold transition-colors"
                 >

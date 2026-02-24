@@ -44,8 +44,8 @@ export async function getCalendarData(month: number, year: number) {
 
         // Map to a unified format
         const items = [
-            ...calendarTasks.map(t => ({ ...t, itemType: 'task' })),
-            ...calendarMilestones.map(m => ({ ...m, itemType: 'milestone' }))
+            ...calendarTasks.map((t: any) => ({ ...t, itemType: 'task' })),
+            ...calendarMilestones.map((m: any) => ({ ...m, itemType: 'milestone' }))
         ];
 
         return { success: true, data: items };

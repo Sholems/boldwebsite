@@ -10,7 +10,7 @@ interface Project {
     title: string;
     status: string | null;
     type: string | null;
-    dueDate: Date | null;
+    dueDate: Date | null | string;
     description: string | null;
     taskCount: number;
     managerName: string | null;
@@ -25,7 +25,7 @@ export default function StaffProjectsPage() {
         const fetchProjects = async () => {
             if (user) {
                 const { data } = await getStaffProjects(user.id);
-                setProjects(data || []);
+                setProjects((data as any[]) || []);
                 setLoading(false);
             }
         };
@@ -53,7 +53,7 @@ export default function StaffProjectsPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {projects.map((project) => (
+                {(projects as any[]).map((project: any) => (
                     <Link
                         href={`/admin/projects/${project.id}`}
                         key={project.id}
@@ -72,9 +72,9 @@ export default function StaffProjectsPage() {
                                     )}
                                 </div>
                                 <span className={`px-3 py-1 text-xs font-bold uppercase rounded-sm ${project.status === 'active' ? 'bg-green-50 text-green-700' :
-                                        project.status === 'completed' ? 'bg-blue-50 text-blue-700' :
-                                            project.status === 'on_hold' ? 'bg-yellow-50 text-yellow-700' :
-                                                'bg-slate-100 text-slate-600'
+                                    project.status === 'completed' ? 'bg-blue-50 text-blue-700' :
+                                        project.status === 'on_hold' ? 'bg-yellow-50 text-yellow-700' :
+                                            'bg-slate-100 text-slate-600'
                                     }`}>
                                     {project.status?.replace('_', ' ') || 'Unknown'}
                                 </span>

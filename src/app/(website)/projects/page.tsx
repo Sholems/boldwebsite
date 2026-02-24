@@ -1,5 +1,6 @@
 
 import { getProjects } from "@/actions/projects";
+export const dynamic = 'force-dynamic';
 import ProjectsPage from "@/components/ProjectsPage";
 import DemoSeeder from "@/components/DemoSeeder";
 

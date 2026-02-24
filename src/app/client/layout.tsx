@@ -90,17 +90,16 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         </div>
 
         <nav className="flex-1 p-4 space-y-2">
-          {navItems.map((item) => {
+          {navItems.map((item: any) => {
             const Icon = item.icon;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${
-                  isActive(item.href, item.exactMatch)
+                className={`flex items-center gap-3 px-4 py-3 rounded-md text-sm font-medium transition-all ${isActive(item.href, item.exactMatch)
                     ? 'bg-brand-gold text-brand-navy shadow-lg shadow-brand-gold/20'
                     : 'text-slate-400 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 <Icon className="w-4 h-4" />
                 {item.label}

@@ -1,4 +1,5 @@
 'use client';
+export const dynamic = 'force-dynamic';
 
 import { useEffect, useState } from 'react';
 import { useAuthStore } from '@/store/authStore';
@@ -54,7 +55,7 @@ export default function ClientMessagesPage() {
         setSelectedConversation(conv);
         const { data } = await getMessages(user.id, conv.partnerId);
         setMessages(data || []);
-        setConversations(prev => prev.map(c =>
+        setConversations(prev => prev.map((c: any) =>
             c.partnerId === conv.partnerId ? { ...c, unreadCount: 0 } : c
         ));
     };
@@ -102,7 +103,7 @@ export default function ClientMessagesPage() {
                                     <p className="text-xs mt-2">Our team will reach out to you soon!</p>
                                 </div>
                             ) : (
-                                conversations.map((conv) => (
+                                conversations.map((conv: any) => (
                                     <div
                                         key={conv.partnerId}
                                         onClick={() => openConversation(conv)}
@@ -123,8 +124,8 @@ export default function ClientMessagesPage() {
                                                     )}
                                                 </div>
                                                 <span className={`text-[9px] px-1.5 py-0.5 rounded font-bold uppercase ${conv.partnerRole === 'admin' ? 'bg-purple-100 text-purple-600' :
-                                                        conv.partnerRole === 'staff' ? 'bg-blue-100 text-blue-600' :
-                                                            'bg-slate-100 text-slate-500'
+                                                    conv.partnerRole === 'staff' ? 'bg-blue-100 text-blue-600' :
+                                                        'bg-slate-100 text-slate-500'
                                                     }`}>
                                                     {conv.partnerRole === 'admin' ? 'Team Lead' : conv.partnerRole === 'staff' ? 'Team Member' : 'Team'}
                                                 </span>
@@ -166,14 +167,14 @@ export default function ClientMessagesPage() {
                                             <p className="text-xs mt-2">Send a message to get started!</p>
                                         </div>
                                     ) : (
-                                        messages.map((msg) => (
+                                        messages.map((msg: any) => (
                                             <div
                                                 key={msg.id}
                                                 className={`flex ${msg.senderId === user?.id ? 'justify-end' : 'justify-start'}`}
                                             >
                                                 <div className={`max-w-[70%] p-4 rounded-lg ${msg.senderId === user?.id
-                                                        ? 'bg-brand-navy text-white'
-                                                        : 'bg-white border border-slate-200'
+                                                    ? 'bg-brand-navy text-white'
+                                                    : 'bg-white border border-slate-200'
                                                     }`}>
                                                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                                                     <p className={`text-[10px] mt-2 ${msg.senderId === user?.id ? 'text-slate-300' : 'text-slate-400'

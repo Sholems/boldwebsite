@@ -1,4 +1,5 @@
 import { getInvoices, getClients } from '@/actions/finance';
+export const dynamic = 'force-dynamic';
 import { getFinanceAnalytics, getExpenses } from '@/actions/financeEnhancements';
 import InvoiceManager from '@/components/admin/InvoiceManager';
 import CreateInvoiceModal from '@/components/admin/CreateInvoiceModal';

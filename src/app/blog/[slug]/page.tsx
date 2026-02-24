@@ -15,7 +15,7 @@ export default async function BlogPostRoute({ params }: { params: Promise<{ slug
 
     const post = postRes.data;
     const allPosts = allPostsRes.data || [];
-    const currentIndex = allPosts.findIndex(p => p.id === post.id);
+    const currentIndex = allPosts.findIndex((p: any) => p.id === post.id);
     const nextPost = currentIndex > 0 ? allPosts[currentIndex - 1] : null;
 
     return <BlogPostPage post={post} nextPost={nextPost ? { title: nextPost.title, slug: nextPost.slug } : undefined} />;

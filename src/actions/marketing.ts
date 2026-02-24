@@ -62,28 +62,28 @@ export async function sendCampaign(campaignId: string) {
 
         // 2. Get recipients based on audience
         let recipients: { email: string; name: string }[] = [];
-        
+
         if (campaign.audience === 'leads' || campaign.audience === 'all') {
             const leadList = await db.select({ email: leads.email, name: leads.firstName }).from(leads);
-            recipients.push(...leadList.map(l => ({ email: l.email, name: l.name })));
+            recipients.push(...leadList.map((l: any) => ({ email: l.email, name: l.name })));
         }
-        
+
         if (campaign.audience === 'clients' || campaign.audience === 'all') {
             const clientList = await db.select({ email: users.email, name: users.name })
                 .from(users)
                 .where(eq(users.role, 'user'));
-            recipients.push(...clientList.map(c => ({ email: c.email, name: c.name || 'Valued Client' })));
+            recipients.push(...clientList.map((c: any) => ({ email: c.email, name: c.name || 'Valued Client' })));
         }
-        
+
         if (campaign.audience === 'staff' || campaign.audience === 'all') {
             const staffList = await db.select({ email: users.email, name: users.name })
                 .from(users)
                 .where(or(eq(users.role, 'admin'), eq(users.role, 'staff')));
-            recipients.push(...staffList.map(s => ({ email: s.email, name: s.name || 'Team Member' })));
+            recipients.push(...staffList.map((s: any) => ({ email: s.email, name: s.name || 'Team Member' })));
         }
 
         // Remove duplicates by email
-        const uniqueRecipients = Array.from(new Map(recipients.map(r => [r.email, r])).values());
+        const uniqueRecipients = Array.from(new Map(recipients.map((r: any) => [r.email, r])).values());
 
         if (uniqueRecipients.length === 0) {
             return { success: false, error: 'No recipients found for this audience' };
@@ -119,9 +119,9 @@ export async function sendCampaign(campaignId: string) {
             .where(eq(campaigns.id, campaignId));
 
         revalidatePath('/admin/marketing');
-        return { 
-            success: true, 
-            sent: successCount, 
+        return {
+            success: true,
+            sent: successCount,
             failed: failCount,
             message: `Campaign sent to ${successCount} recipients${failCount > 0 ? `, ${failCount} failed` : ''}`
         };
@@ -138,7 +138,7 @@ export async function getSequences() {
     try {
         const data = await db.select().from(sequences).orderBy(desc(sequences.createdAt));
         // Fetch steps for each sequence
-        const sequencesWithSteps = await Promise.all(data.map(async (seq) => {
+        const sequencesWithSteps = await Promise.all(data.map(async (seq: any) => {
             const steps = await db.select().from(sequenceSteps)
                 .where(eq(sequenceSteps.sequenceId, seq.id))
                 .orderBy(sequenceSteps.order);
@@ -159,7 +159,7 @@ export async function createSequence(name: string, description: string, steps: a
 
         if (steps && steps.length > 0) {
             await db.insert(sequenceSteps).values(
-                steps.map((step, index) => ({
+                steps.map((step: any, index: number) => ({
                     sequenceId: newSequence.id,
                     subject: step.subject,
                     content: step.content,
@@ -242,7 +242,7 @@ export async function processSequenceStep(enrollmentId: string) {
             // Schedule next step
             const nextRunDate = new Date();
             nextRunDate.setDate(nextRunDate.getDate() + (nextStep.delayDays || 1));
-            
+
             await db.update(sequenceEnrollments)
                 .set({ currentStep: nextStepOrder, nextRunAt: nextRunDate })
                 .where(eq(sequenceEnrollments.id, enrollmentId));

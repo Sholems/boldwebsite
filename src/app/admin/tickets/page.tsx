@@ -6,11 +6,11 @@ import Link from 'next/link';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  Ticket, 
-  Clock, 
-  CheckCircle2, 
-  AlertCircle, 
+import {
+  Ticket,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
   Filter,
   User,
   RefreshCw
@@ -95,9 +95,9 @@ export default function AdminTicketsPage() {
     }
   };
 
-  const openCount = tickets.filter(t => t.status === 'open').length;
-  const inProgressCount = tickets.filter(t => t.status === 'in_progress').length;
-  const unassignedCount = tickets.filter(t => !t.assignedToId).length;
+  const openCount = tickets.filter((t: any) => t.status === 'open').length;
+  const inProgressCount = tickets.filter((t: any) => t.status === 'in_progress').length;
+  const unassignedCount = tickets.filter((t: any) => !t.assignedToId).length;
 
   return (
     <div className="space-y-6">
@@ -180,7 +180,7 @@ export default function AdminTicketsPage() {
               <Filter className="w-4 h-4 text-slate-400" />
               <span className="text-sm text-slate-500">Filters:</span>
             </div>
-            
+
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
@@ -256,7 +256,7 @@ export default function AdminTicketsPage() {
                 </tr>
               </thead>
               <tbody>
-                {tickets.map((ticket) => (
+                {tickets.map((ticket: any) => (
                   <tr key={ticket.id} className="border-b last:border-0 hover:bg-slate-50">
                     <td className="p-4">
                       <Link href={`/admin/tickets/${ticket.id}`} className="hover:text-brand-gold">
@@ -298,7 +298,7 @@ export default function AdminTicketsPage() {
                         className="text-xs border border-slate-200 rounded px-2 py-1 bg-white min-w-[120px]"
                       >
                         <option value="">Unassigned</option>
-                        {staff.map(s => (
+                        {staff.map((s: any) => (
                           <option key={s.id} value={s.id}>{s.name || s.email}</option>
                         ))}
                       </select>

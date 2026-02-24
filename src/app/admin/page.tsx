@@ -1,5 +1,6 @@
 
 import React from 'react';
+export const dynamic = 'force-dynamic';
 import { getProjects } from "@/actions/projects";
 import { getDashboardMetrics } from "@/actions/dashboard";
 import ProjectManager from "@/components/admin/ProjectManager";
@@ -88,7 +89,7 @@ export default async function AdminDashboardPage() {
 
             {/* Metrics Grid - Now with live data */}
             <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-4">
-                {dashboardMetrics.map(metric => (
+                {dashboardMetrics.map((metric: any) => (
                     <div key={metric.id} className="bg-white p-5 rounded-lg border border-slate-200 shadow-sm relative overflow-hidden group hover:border-brand-gold hover:shadow-md transition-all">
                         <div className="absolute top-0 right-0 p-2 opacity-30">
                             <span className="text-[8px] text-slate-400">{metric.id}</span>
